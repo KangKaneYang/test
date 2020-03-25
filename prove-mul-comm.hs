@@ -104,17 +104,17 @@ lemma (EqlS eq1) eq2 = EqlS $ lemma eq1 eq2
 timesComm :: Natural a -> Natural b -> Equal (a :*: b) (b :*: a)
 timesComm NumZ a = zeroComm a
 timesComm a NumZ = symmetric $ zeroComm a
-timesComm (NumS a) (NumS b) = subst (subst ab1 (symmetric comp)) a1b
+timesComm (NumS a) (NumS b) = subst (subst ab1 (symmetric comp)) (symmetric a1b)
   where
     ab_comm = timesComm a b -- a * b = b * a
-    a1b_comm = timesComm (NumS a) b -- (S a) * b = b * （S a）
+    a1b_comm = timesComm (NumS a) b -- (S a) * b = b * (S a)
     ab1_comm = timesComm a (NumS b) -- a * (S b) = (S b) * a
     a1b_ab1 = plusS a b -- (S a) + b = a + (S b)
     a1b_ab1_comm = subst a1b_ab1 (plusCommutes a (NumS b)) -- (S a) + b = (S b) + a
     comp = lemma a1b_ab1_comm ab_comm -- ((S a) + b) + (a * b) = ((S b) + a) + (b * a)
-    lemma1 = plusAssoc (NumS a) b (mul a b) -- (S a) + (b + (a * b)) = ((S a) + b) + (a * b) 
-    lemma2 = plusAssoc (NumS b) a (mul b a) -- (S b) + (a + (b * a)) = ((S b) + a) + (b * a)
+    assc1 = plusAssoc (NumS a) b (mul a b) -- (S a) + (b + (a * b)) = ((S a) + b) + (a * b) => (S a) + (S a)*b = ((S a) + b) + (a * b)
+    assc2 = plusAssoc (NumS b) a (mul b a) -- (S b) + (a + (b * a)) = ((S b) + a) + (b * a) => (S b) + (S b)*a = ((S b) + a) + (b * a)
     a1b_cop = lemma (reflexive (NumS a)) a1b_comm -- (S a) + (S a) * b = (S a) + b * (S a)
     ab1_cop = lemma (reflexive (NumS b)) ab1_comm -- (S b) + a * (S b) = (S b) + (S b) * a
-    a1b = subst (symmetric a1b_cop) lemma1 -- (S a) + b * (S a) = ((S a) + b) + (a * b)
-    ab1 = subst ab1_cop lemma2 -- (S b) + a * (S b) = ((S b) + a) + (b * a)
+    a1b = subst (symmetric a1b_cop) assc1 -- (S a) + b * (S a) = ((S a) + b) + (a * b)
+    ab1 = subst ab1_cop assc2 -- (S b) + a * (S b) = ((S b) + a) + (b * a)
